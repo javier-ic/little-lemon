@@ -13,8 +13,10 @@ import * as ImagePicker from "expo-image-picker";
 
 import UserApp from "../Providers/User";
 import AppContext from "./../Providers/AppContext";
+
 import CtmInputText from "../Components/CtmInputText";
 import CtmButton from "../Components/CtmButton";
+import CtmCheckbox from "../Components/CtmChekbox";
 
 export default function ProfileScreen() {
   const { appState, setAppState } = useContext(AppContext);
@@ -49,7 +51,6 @@ export default function ProfileScreen() {
   };
 
   const saveInfo = async () => {
-    console.log(appState);
     await AsyncStorage.mergeItem("user", JSON.stringify(appState.User));
     Alert.alert("Done", "Your info was saved");
   };
@@ -168,9 +169,50 @@ export default function ProfileScreen() {
                 handlerSetter("phoneNumber", v);
               }}
             />
+            <Text
+              style={{ fontSize: 22, fontWeight: "bold", marginVertical: 15 }}
+            >
+              Email notification
+            </Text>
+            <CtmCheckbox
+              label="Order statuses"
+              value={appState.User.orderStatuses}
+              setter={(v) => {
+                handlerSetter("orderStatuses", v);
+                setAppState({ ...appState });
+              }}
+            />
+            <CtmCheckbox
+              label="Password changes"
+              value={appState.User.passwordChanges}
+              setter={(v) => {
+                handlerSetter("passwordChanges", v);
+                setAppState({ ...appState });
+              }}
+            />
+            <CtmCheckbox
+              label="Special offers"
+              value={appState.User.specialOffers}
+              setter={(v) => {
+                handlerSetter("specialOffers", v);
+                setAppState({ ...appState });
+              }}
+            />
+            <CtmCheckbox
+              label="Newsletter"
+              value={appState.User.newsletter}
+              setter={(v) => {
+                handlerSetter("newsletter", v);
+                setAppState({ ...appState });
+              }}
+            />
           </View>
           <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginTop: 50,
+            }}
           >
             <View>
               <CtmButton label="Discar changes" action={reset} />

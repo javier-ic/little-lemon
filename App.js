@@ -10,9 +10,9 @@ import {
 
 import { useState, useEffect } from "react";
 
-import SplashScreen from "./screens/Splash";
-import OnboardingScreen from "./screens/Onboarding";
-import Profile from "./screens/Profile";
+import SplashScreen from "./Screens/Splash";
+import OnboardingScreen from "./Screens/Onboarding";
+import Profile from "./Screens/Profile";
 
 // Providers
 import AppContext from "./Providers/AppContext";
