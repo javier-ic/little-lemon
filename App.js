@@ -13,6 +13,7 @@ import { useState, useEffect } from "react";
 import SplashScreen from "./Screens/Splash";
 import OnboardingScreen from "./Screens/Onboarding";
 import Profile from "./Screens/Profile";
+import Home from "./Screens/Home";
 
 // Providers
 import AppContext from "./Providers/AppContext";
@@ -44,7 +45,10 @@ export default function App() {
           <NavigationContainer>
             <Stack.Navigator>
               {appState.OnBoardingComplete ? (
-                <Stack.Screen name="Profile" component={Profile} />
+                <>
+                  <Stack.Screen name="Home" component={Home} />
+                  <Stack.Screen name="Profile" component={Profile} />
+                </>
               ) : (
                 <Stack.Screen name="Onboarding" component={OnboardingScreen} />
               )}

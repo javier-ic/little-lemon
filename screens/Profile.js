@@ -6,6 +6,7 @@ import {
   Alert,
   Image,
   StyleSheet,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { useContext } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -96,135 +97,140 @@ export default function ProfileScreen() {
           borderRadius: 16,
         }}
       >
-        <View style={{ padding: 20 }}>
-          <View>
-            <Text style={{ fontSize: 26, fontWeight: "bold" }}>
-              Profile Page
-            </Text>
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              paddingVertical: 10,
-              alignItems: "center",
-            }}
-          >
+        <TouchableWithoutFeedback>
+          <View style={{ padding: 20 }}>
             <View>
-              <Text style={{ fontSize: 16, color: "gray" }}>Avatar</Text>
-
-              {appState.User.image ? (
-                <Image
-                  source={{ uri: appState.User.image }}
-                  style={[styles.image, { resizeMode: "cover" }]}
-                ></Image>
-              ) : (
-                <View style={styles.image}>
-                  <Text style={{ fontSize: 45, color: "white" }}>
-                    {initials(
-                      appState.User.firstName || "",
-                      appState.User.lastName || ""
-                    )}
-                  </Text>
-                </View>
-              )}
+              <Text style={{ fontSize: 26, fontWeight: "bold" }}>
+                Profile Page
+              </Text>
             </View>
-            <View style={{ marginHorizontal: 20 }}>
-              <CtmButton label="Change" action={handlerImage}></CtmButton>
-            </View>
-            <View>
-              <CtmButton label="Remove" action={handlerImageRemove}></CtmButton>
-            </View>
-          </View>
-          <View>
-            <CtmInputText
-              label="First name"
-              value={appState.User.firstName}
-              setter={(v) => {
-                handlerSetter("firstName", v);
+            <View
+              style={{
+                flexDirection: "row",
+                paddingVertical: 10,
+                alignItems: "center",
               }}
-            />
-            <CtmInputText
-              label="Last name"
-              value={appState.User.lastName}
-              setter={(v) => {
-                handlerSetter("lastName", v);
-              }}
-            />
-            <CtmInputText
-              label="Email"
-              keyboardType="email-address"
-              value={appState.User.email}
-              setter={(v) => {
-                handlerSetter("email", v);
-              }}
-            />
-            <CtmInputText
-              label="Phone number"
-              value={appState.User.phoneNumber}
-              keyboardType="numeric"
-              mask="(999)-999-9999"
-              isMask={true}
-              placeholder="(999)-999-9999"
-              setter={(v) => {
-                handlerSetter("phoneNumber", v);
-              }}
-            />
-            <Text
-              style={{ fontSize: 22, fontWeight: "bold", marginVertical: 15 }}
             >
-              Email notification
-            </Text>
-            <CtmCheckbox
-              label="Order statuses"
-              value={appState.User.orderStatuses}
-              setter={(v) => {
-                handlerSetter("orderStatuses", v);
-                setAppState({ ...appState });
-              }}
-            />
-            <CtmCheckbox
-              label="Password changes"
-              value={appState.User.passwordChanges}
-              setter={(v) => {
-                handlerSetter("passwordChanges", v);
-                setAppState({ ...appState });
-              }}
-            />
-            <CtmCheckbox
-              label="Special offers"
-              value={appState.User.specialOffers}
-              setter={(v) => {
-                handlerSetter("specialOffers", v);
-                setAppState({ ...appState });
-              }}
-            />
-            <CtmCheckbox
-              label="Newsletter"
-              value={appState.User.newsletter}
-              setter={(v) => {
-                handlerSetter("newsletter", v);
-                setAppState({ ...appState });
-              }}
-            />
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginTop: 50,
-            }}
-          >
-            <View>
-              <CtmButton label="Discar changes" action={reset} />
+              <View>
+                <Text style={{ fontSize: 16, color: "gray" }}>Avatar</Text>
+
+                {appState.User.image ? (
+                  <Image
+                    source={{ uri: appState.User.image }}
+                    style={[styles.image, { resizeMode: "cover" }]}
+                  ></Image>
+                ) : (
+                  <View style={styles.image}>
+                    <Text style={{ fontSize: 45, color: "white" }}>
+                      {initials(
+                        appState.User.firstName || "",
+                        appState.User.lastName || ""
+                      )}
+                    </Text>
+                  </View>
+                )}
+              </View>
+              <View style={{ marginHorizontal: 20 }}>
+                <CtmButton label="Change" action={handlerImage}></CtmButton>
+              </View>
+              <View>
+                <CtmButton
+                  label="Remove"
+                  action={handlerImageRemove}
+                ></CtmButton>
+              </View>
             </View>
             <View>
-              <CtmButton label="Save Changes" action={saveInfo} />
+              <CtmInputText
+                label="First name"
+                value={appState.User.firstName}
+                setter={(v) => {
+                  handlerSetter("firstName", v);
+                }}
+              />
+              <CtmInputText
+                label="Last name"
+                value={appState.User.lastName}
+                setter={(v) => {
+                  handlerSetter("lastName", v);
+                }}
+              />
+              <CtmInputText
+                label="Email"
+                keyboardType="email-address"
+                value={appState.User.email}
+                setter={(v) => {
+                  handlerSetter("email", v);
+                }}
+              />
+              <CtmInputText
+                label="Phone number"
+                value={appState.User.phoneNumber}
+                keyboardType="numeric"
+                mask="(999)-999-9999"
+                isMask={true}
+                placeholder="(999)-999-9999"
+                setter={(v) => {
+                  handlerSetter("phoneNumber", v);
+                }}
+              />
+              <Text
+                style={{ fontSize: 22, fontWeight: "bold", marginVertical: 15 }}
+              >
+                Email notification
+              </Text>
+              <CtmCheckbox
+                label="Order statuses"
+                value={appState.User.orderStatuses}
+                setter={(v) => {
+                  handlerSetter("orderStatuses", v);
+                  setAppState({ ...appState });
+                }}
+              />
+              <CtmCheckbox
+                label="Password changes"
+                value={appState.User.passwordChanges}
+                setter={(v) => {
+                  handlerSetter("passwordChanges", v);
+                  setAppState({ ...appState });
+                }}
+              />
+              <CtmCheckbox
+                label="Special offers"
+                value={appState.User.specialOffers}
+                setter={(v) => {
+                  handlerSetter("specialOffers", v);
+                  setAppState({ ...appState });
+                }}
+              />
+              <CtmCheckbox
+                label="Newsletter"
+                value={appState.User.newsletter}
+                setter={(v) => {
+                  handlerSetter("newsletter", v);
+                  setAppState({ ...appState });
+                }}
+              />
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginTop: 50,
+              }}
+            >
+              <View>
+                <CtmButton label="Discar changes" action={reset} />
+              </View>
+              <View>
+                <CtmButton label="Save Changes" action={saveInfo} />
+              </View>
+            </View>
+            <View style={{ marginVertical: 20 }}>
+              <CtmButton label="Log out" action={logOut} />
             </View>
           </View>
-          <View style={{ marginVertical: 20 }}>
-            <CtmButton label="Log out" action={logOut} />
-          </View>
-        </View>
+        </TouchableWithoutFeedback>
       </ScrollView>
     </SafeAreaView>
   );
