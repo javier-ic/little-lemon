@@ -4,30 +4,44 @@ import {
   View,
   Text,
   FlatList,
-  StyleSheet,
   TouchableWithoutFeedback,
+  Alert,
+  StyleSheet,
+  TextInput,
+  Keyboard,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import AppContext from "../Providers/AppContext";
 
-import db from "../Providers/Database";
+import CtmFilter from "../Components/CtmFilter";
+
+import Styles, { gray } from "../Providers/Styles";
+
+import { AntDesign } from "@expo/vector-icons";
+
+import {
+  getMenu,
+  populateMenu,
+  getCategories,
+  filterItems,
+} from "./../Providers/DBMenu";
 
 const RenderItem = ({ item: { name, description, price, image } }) => {
   return (
     <TouchableWithoutFeedback>
-      <View style={styles.menuItem}>
-        <View style={styles.menuInfo}>
+      <View style={Styles.menuItem}>
+        <View style={Styles.menuInfo}>
           <View>
-            <Text style={styles.title}>{name}</Text>
+            <Text style={[Styles.title, Styles.textGreen]}>{name}</Text>
           </View>
           <View>
-            <Text style={styles.body}>{description}</Text>
+            <Text style={[Styles.body, Styles.textGray, { marginBottom: 10 }]}>
+              {description}
+            </Text>
           </View>
           <View>
-            <Text style={styles.subTitle}>${price}</Text>
+            <Text style={[Styles.subTitle, Styles.textGreen]}>${price}</Text>
           </View>
         </View>
-        <View style={styles.menuPicture}>
+        <View style={Styles.menuPicture}>
           {image && (
             <Image
               source={{ uri: image }}
@@ -40,42 +54,14 @@ const RenderItem = ({ item: { name, description, price, image } }) => {
   );
 };
 
-const getMenu = () => {
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "SELECT * FROM menu;",
-        [],
-        (_tx, { rows: { _array } }) => resolve(_array),
-        (_tx, e) => reject(e)
-      );
-    });
-  });
-};
-
-const populateMenu = (items) => {
-  const _items = items.map(
-    (e) =>
-      `("${e.id}", "${e.category}","${e.description}","${e.image}","${e.price}","${e.name}")`
-  );
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "INSERT INTO menu (id, category, description, image, price, name) VALUES " +
-          _items.join(",") +
-          ";",
-        [],
-        (_tx, r) => resolve(r),
-        (_tx, e) => reject(e)
-      );
-    });
-  });
-};
-
 export default function SplashScreen() {
-  const { appState, setAppState } = useContext(AppContext);
-
   const [menu, setMenu] = useState([]);
+  const [categoriesFilter, setCategoriesFilter] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [keyWord, setKeyWord] = useState("");
+
+  const [timeOutId, setTimeOutId] = useState(null);
+  const [keyboardStatus, setKeyboardStatus] = useState(false);
 
   const getData = async (url) => {
     try {
@@ -84,6 +70,17 @@ export default function SplashScreen() {
     } catch (e) {
       return [];
     }
+  };
+
+  const filter = () => {
+    filterItems(categoriesFilter, keyWord)
+      .then((data) => setMenu([...data]))
+      .catch((e) => {
+        Alert.alert(
+          "Error",
+          "An error occurs while trying to filter information"
+        );
+      });
   };
 
   useEffect(() => {
@@ -112,73 +109,128 @@ export default function SplashScreen() {
       })
       .catch((e) => console.log(e));
   }, []);
+
+  useEffect(() => {
+    getCategories()
+      .then((data) => {
+        setCategories([...data]);
+      })
+      .catch((e) => {
+        setCategories([...[]]);
+      });
+  }, [menu]);
+
+  useEffect(() => {
+    clearTimeout(timeOutId);
+    const id = setTimeout(() => {
+      filter();
+    }, 500);
+    setTimeOutId(id);
+  }, [keyWord]);
+
+  useEffect(() => {
+    filter();
+  }, [categoriesFilter]);
+
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
+      setKeyboardStatus(true);
+    });
+    const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardStatus(false);
+    });
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
+
   return (
     <View style={{ flex: 1 }}>
-      <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
-        <Image
-          source={require("./../assets/Logo.png")}
-          style={{
-            width: "50%",
-            height: 70,
-            resizeMode: "contain",
-            marginHorizontal: 10,
-          }}
-        />
-        {appState.User.image && (
-          <Image
-            source={{ uri: appState.User.image }}
-            style={{
-              width: 70,
-              height: 70,
-              resizeMode: "contain",
-              borderRadius: 100,
-              marginHorizontal: 10,
-            }}
-          />
+      <View style={[HomeStyles.heroBanner, { padding: 10 }, Styles.bgGreen]}>
+        {!keyboardStatus && (
+          <>
+            <View>
+              <Text style={[Styles.textYellow, Styles.title, { fontSize: 40 }]}>
+                Little Lemon
+              </Text>
+            </View>
+            <View style={{ flexDirection: "row" }}>
+              <View style={{ flex: 5 }}>
+                <View>
+                  <Text style={[Styles.textWhite, Styles.title]}>Chicago</Text>
+                </View>
+                <View>
+                  <Text style={[Styles.textWhite, Styles.body]}>
+                    We are a family owned Mediterranean restaurant, focused on
+                    traditional recipes served whit a modern twist.
+                  </Text>
+                </View>
+              </View>
+              <View style={{ flex: 4 }}>
+                <Image
+                  source={require("./../assets/HeroImage.png")}
+                  style={HomeStyles.heroImage}
+                />
+              </View>
+            </View>
+          </>
         )}
+        <View
+          style={[
+            Styles.bgWhite,
+            {
+              flexDirection: "row",
+              padding: 10,
+              marginTop: 20,
+              borderRadius: 16,
+            },
+          ]}
+        >
+          <AntDesign name="search1" size={24} color="black" />
+          <TextInput
+            style={[
+              Styles.textGreen,
+              Styles.subTitle,
+              { marginHorizontal: 10, flex: 1 },
+            ]}
+            onChangeText={(t) => setKeyWord(t)}
+            placeholder="Type here to find your dish"
+          />
+        </View>
       </View>
-      <View>
-        <Text>Filters</Text>
+      <View style={[HomeStyles.filterBox, { padding: 10 }]}>
+        <Text style={[Styles.title, { marginBottom: 10 }, Styles.textGreen]}>
+          ORDER FOR DELIVERY!
+        </Text>
+        <CtmFilter
+          values={categoriesFilter}
+          setter={setCategoriesFilter}
+          categories={categories}
+        />
       </View>
-      <SafeAreaView style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
         <FlatList
           data={menu}
           renderItem={({ item }) => <RenderItem item={item} />}
           keyExtractor={(item) => item.id}
         ></FlatList>
-      </SafeAreaView>
+      </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  menuItem: {
-    flexDirection: "row",
-    marginVertical: 10,
-    borderBottomColor: "gray",
+const HomeStyles = StyleSheet.create({
+  filterBox: {
+    borderBottomColor: gray,
     borderBottomWidth: 1,
-    padding: 10,
+    paddingBottom: 20,
   },
-  menuInfo: {
-    flex: 4,
-  },
-  menuPicture: {
-    flex: 2,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 22,
-    marginBottom: 10,
-    fontWeight: "bold",
-  },
-  subTitle: {
-    fontSize: 18,
-    color: "gray",
-    fontWeight: "bold",
-  },
-  body: {
-    fontSize: 16,
-    marginBottom: 10,
+  heroBanner: {},
+  heroImage: {
+    width: "100%",
+    height: 130,
+    resizeMode: "cover",
+    borderRadius: 20,
   },
 });
