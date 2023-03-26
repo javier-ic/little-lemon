@@ -1,9 +1,10 @@
 // import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import * as NavigationBar from "expo-navigation-bar";
+
 import {
   StyleSheet,
-  KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
   SafeAreaView,
@@ -19,6 +20,7 @@ import Home from "./Screens/Home";
 // Providers
 import AppContext from "./Providers/AppContext";
 import User from "./Providers/User";
+import Styles, { white } from "./Providers/Styles";
 
 // Components
 import CtmHeader from "./Components/CtmHeader";
@@ -31,6 +33,13 @@ export default function App() {
     OnBoardingComplete: false,
   });
 
+  const NavigationBarVisible = NavigationBar.useVisibility();
+
+  if (NavigationBarVisible == "visible") {
+    NavigationBar.setBackgroundColorAsync(white);
+    NavigationBar.setButtonStyleAsync("dark");
+  }
+
   useEffect(() => {
     User.fetchUser(appState, setAppState);
   }, []);
@@ -40,40 +49,36 @@ export default function App() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <AppContext.Provider value={{ appState, setAppState }}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={{ flex: 1 }}
-          >
-            <NavigationContainer>
-              <Stack.Navigator>
-                {appState.OnBoardingComplete ? (
-                  <>
-                    <Stack.Screen
-                      name="Home"
-                      component={Home}
-                      options={{ header: CtmHeader }}
-                    />
-                    <Stack.Screen
-                      name="Profile"
-                      component={Profile}
-                      options={{ header: CtmHeader }}
-                    />
-                  </>
-                ) : (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <SafeAreaView style={[{ flex: 1 }, Styles.bgWhite]}>
+        <AppContext.Provider value={{ appState, setAppState }}>
+          <NavigationContainer>
+            <Stack.Navigator>
+              {appState.OnBoardingComplete ? (
+                <>
                   <Stack.Screen
-                    name="Onboarding"
-                    component={OnboardingScreen}
+                    name="Home"
+                    component={Home}
+                    options={{ header: CtmHeader }}
                   />
-                )}
-              </Stack.Navigator>
-            </NavigationContainer>
-          </KeyboardAvoidingView>
-        </TouchableWithoutFeedback>
-      </AppContext.Provider>
-    </SafeAreaView>
+                  <Stack.Screen
+                    name="Profile"
+                    component={Profile}
+                    options={{ header: CtmHeader }}
+                  />
+                </>
+              ) : (
+                <Stack.Screen
+                  name="Onboarding"
+                  component={OnboardingScreen}
+                  options={{ header: CtmHeader }}
+                />
+              )}
+            </Stack.Navigator>
+          </NavigationContainer>
+        </AppContext.Provider>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 }
 

@@ -1,4 +1,4 @@
-import { Text, Pressable } from "react-native";
+import { Text, StyleSheet, Pressable } from "react-native";
 
 export default function CtmButton(props) {
   const { label, action, disabled } = {
@@ -9,13 +9,10 @@ export default function CtmButton(props) {
   };
   return (
     <Pressable
-      style={{
-        backgroundColor: disabled ? "#E8E8EC" : "#495E57",
-        borderRadius: 16,
-        paddingVertical: 20,
-        paddingHorizontal: 15,
-        width: "100%",
-      }}
+      style={[
+        styles.button,
+        { backgroundColor: disabled ? "#E8E8EC" : "#495E57" },
+      ]}
       disabled={disabled}
       onPress={action}
     >
@@ -31,3 +28,12 @@ export default function CtmButton(props) {
     </Pressable>
   );
 }
+
+const styles = StyleSheet.create({
+  button: {
+    borderRadius: 5,
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    width: "100%",
+  },
+});

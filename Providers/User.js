@@ -16,6 +16,7 @@ const User = {
           ...appState,
           Loading: false,
           OnBoardingComplete: false,
+          User: null,
         });
       }
     } catch (e) {

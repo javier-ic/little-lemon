@@ -1,12 +1,10 @@
 import {
   Text,
   View,
-  SafeAreaView,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
   ScrollView,
   Alert,
-  Image,
-  StyleSheet,
-  TouchableWithoutFeedback,
 } from "react-native";
 import { useContext } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -18,6 +16,7 @@ import AppContext from "./../Providers/AppContext";
 import CtmInputText from "../Components/CtmInputText";
 import CtmButton from "../Components/CtmButton";
 import CtmCheckbox from "../Components/CtmChekbox";
+import CtmAvatar from "../Components/CtmAvatar";
 
 export default function ProfileScreen() {
   const { appState, setAppState } = useContext(AppContext);
@@ -72,29 +71,19 @@ export default function ProfileScreen() {
     }
   };
 
-  const initials = (firstName, lastName) => {
-    try {
-      return (
-        String(firstName).substring(0, 1) + String(lastName).substring(0, 1)
-      );
-    } catch (e) {
-      return ":)";
-    }
-  };
-
   if (!appState.User) {
     return <></>;
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+      keyboardVerticalOffset={135}
+    >
       <ScrollView
         style={{
           flex: 1,
-          backgroundColor: "white",
-          borderWidth: 1,
-          borderColor: "gray",
-          borderRadius: 16,
         }}
       >
         <TouchableWithoutFeedback>
@@ -113,22 +102,12 @@ export default function ProfileScreen() {
             >
               <View>
                 <Text style={{ fontSize: 16, color: "gray" }}>Avatar</Text>
-
-                {appState.User.image ? (
-                  <Image
-                    source={{ uri: appState.User.image }}
-                    style={[styles.image, { resizeMode: "cover" }]}
-                  ></Image>
-                ) : (
-                  <View style={styles.image}>
-                    <Text style={{ fontSize: 45, color: "white" }}>
-                      {initials(
-                        appState.User.firstName || "",
-                        appState.User.lastName || ""
-                      )}
-                    </Text>
-                  </View>
-                )}
+                <CtmAvatar
+                  uri={appState.User.image}
+                  firstName={appState.User.firstName}
+                  lastName={appState.User.lastName}
+                  zoom={2}
+                />
               </View>
               <View style={{ marginHorizontal: 20 }}>
                 <CtmButton label="Change" action={handlerImage}></CtmButton>
@@ -166,7 +145,7 @@ export default function ProfileScreen() {
               <CtmInputText
                 label="Phone number"
                 value={appState.User.phoneNumber}
-                keyboardType="numeric"
+                keyboardType="phone-pad"
                 mask="(999)-999-9999"
                 isMask={true}
                 placeholder="(999)-999-9999"
@@ -232,18 +211,6 @@ export default function ProfileScreen() {
           </View>
         </TouchableWithoutFeedback>
       </ScrollView>
-    </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  image: {
-    borderRadius: 100,
-    width: 100,
-    height: 100,
-    marginVertical: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#62D6C4",
-  },
-});

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Image,
   View,
@@ -23,6 +23,7 @@ import {
   getCategories,
   filterItems,
 } from "./../Providers/DBMenu";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const RenderItem = ({ item: { name, description, price, image } }) => {
   return (
@@ -59,9 +60,9 @@ export default function SplashScreen() {
   const [categoriesFilter, setCategoriesFilter] = useState([]);
   const [categories, setCategories] = useState([]);
   const [keyWord, setKeyWord] = useState("");
-
-  const [timeOutId, setTimeOutId] = useState(null);
   const [keyboardStatus, setKeyboardStatus] = useState(false);
+
+  const debaunseRef = useRef();
 
   const getData = async (url) => {
     try {
@@ -69,6 +70,7 @@ export default function SplashScreen() {
       return await data.json();
     } catch (e) {
       return [];
+    } finally {
     }
   };
 
@@ -80,15 +82,31 @@ export default function SplashScreen() {
           "Error",
           "An error occurs while trying to filter information"
         );
-      });
+      })
+      .finally(() => {});
   };
+
+  const debounce = (cb, delay = 500) => {
+    return (...arg) => {
+      if (debaunseRef.current) clearTimeout(debaunseRef.current);
+      debaunseRef.current = setTimeout(() => {
+        cb(...arg);
+      }, delay);
+    };
+  };
+
+  const filterByKeyWord = debounce((text) => {
+    console.log(text);
+    filter();
+  });
 
   useEffect(() => {
     getMenu()
       .then((data) => {
         if (data.length) {
-          setMenu(data);
+          setMenu([...data]);
         } else {
+          console.log("No Datos");
           getData(
             "https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json"
           ).then((data) => {
@@ -100,7 +118,7 @@ export default function SplashScreen() {
               });
               populateMenu(itemsList)
                 .then((d) => {
-                  setMenu(itemsList);
+                  setMenu([...itemsList]);
                 })
                 .catch((e) => console.log(e.message));
             }
@@ -121,11 +139,7 @@ export default function SplashScreen() {
   }, [menu]);
 
   useEffect(() => {
-    clearTimeout(timeOutId);
-    const id = setTimeout(() => {
-      filter();
-    }, 500);
-    setTimeOutId(id);
+    filterByKeyWord(keyWord);
   }, [keyWord]);
 
   useEffect(() => {
@@ -209,13 +223,11 @@ export default function SplashScreen() {
           categories={categories}
         />
       </View>
-      <View style={{ flex: 1 }}>
-        <FlatList
-          data={menu}
-          renderItem={({ item }) => <RenderItem item={item} />}
-          keyExtractor={(item) => item.id}
-        ></FlatList>
-      </View>
+      <FlatList
+        data={menu}
+        renderItem={({ item }) => <RenderItem item={item} />}
+        keyExtractor={(item) => item.id}
+      ></FlatList>
     </View>
   );
 }

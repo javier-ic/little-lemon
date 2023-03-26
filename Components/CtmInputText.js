@@ -24,6 +24,7 @@ export default function CtmInputText(props) {
         value={value}
         placeholder={placeholder}
         onChangeText={(text, rawText) => setter(rawText)}
+        clearButtonMode="always"
       />
     );
   } else {
@@ -34,6 +35,7 @@ export default function CtmInputText(props) {
         value={value}
         onChangeText={setter}
         placeholder={placeholder}
+        clearButtonMode="always"
       ></TextInput>
     );
   }
@@ -55,12 +57,10 @@ const styles = StyleSheet.create({
     padding: 10,
     color: "gray",
     marginBottom: 10,
-    marginLeft: 10,
   },
   label: {
     fontSize: 14,
     color: "gray",
     marginBottom: 10,
-    marginLeft: 10,
   },
 });

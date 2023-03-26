@@ -1,9 +1,18 @@
-import { View, Image, Text, TextInput, Pressable, Alert } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  Alert,
+  KeyboardAvoidingView,
+} from "react-native";
 import { useState, useContext } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import AppContext from "./../Providers/AppContext";
 import User from "../Providers/User";
+import CtmInputText from "./../Components/CtmInputText";
+
+import Styles from "./../Providers/Styles";
 
 export default function OnboardingScreen() {
   const [firstName, setFirstName] = useState("");
@@ -45,100 +54,71 @@ export default function OnboardingScreen() {
   };
   return (
     <>
-      <View
-        style={{
-          flex: 2,
-          backgroundColor: "#DEE3E9",
-          paddingHorizontal: 20,
-        }}
-      >
-        <Image
-          source={require("./../assets/Logo.png")}
-          style={{
-            width: "80%",
-            height: "100%",
-            resizeMode: "contain",
-            alignSelf: "center",
-          }}
-        />
-      </View>
-      <View
-        style={{
-          flex: 10,
-          backgroundColor: "#CBD2D9",
-          paddingHorizontal: 20,
-        }}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={135}
       >
         <View
           style={{
-            flexGrow: 1,
-            alignItems: "center",
-            justifyContent: "center",
+            flex: 10,
+            flexDirection: "column",
+            justifyContent: "space-around",
+            padding: 20,
           }}
         >
-          <Text style={{ fontSize: 24 }}>Let us get to know you</Text>
-        </View>
-        <View style={{ alignItems: "center", paddingVertical: 40 }}>
-          <Text style={{ fontSize: 24 }}>First Name</Text>
-          <TextInput
-            autoComplete="name"
-            clearButtonMode="always"
-            keyboardType="ascii-capable"
+          <View
             style={{
-              borderColor: "#1E1E1E",
-              borderWidth: 1,
-              padding: 10,
-              borderRadius: 10,
-              width: "80%",
-              height: 50,
-              fontSize: 24,
+              alignItems: "center",
+              justifyContent: "center",
             }}
-            value={firstName}
-            onChangeText={(e) => setFirstName(e)}
-          />
-          <Text style={{ fontSize: 24 }}>Email</Text>
-          <TextInput
-            autoComplete="email"
-            clearButtonMode="always"
-            keyboardType="email-address"
-            style={{
-              borderColor: "#1E1E1E",
-              borderWidth: 1,
-              padding: 10,
-              borderRadius: 10,
-              width: "80%",
-              height: 50,
-              fontSize: 24,
-            }}
-            value={email}
-            onChangeText={(e) => setEmail(e)}
-          />
+          >
+            <Text style={[Styles.title, Styles.textGreen, { fontSize: 26 }]}>
+              Let us get to know you
+            </Text>
+          </View>
+
+          <View>
+            <Text style={[Styles.textGreen, { fontSize: 24 }]}>First Name</Text>
+            <CtmInputText
+              value={firstName}
+              setter={setFirstName}
+              placeholder="Type your first name"
+            ></CtmInputText>
+
+            <Text style={[Styles.textGreen, { fontSize: 24 }]}>Email</Text>
+            <CtmInputText
+              keyboardType="email-address"
+              value={email}
+              setter={setEmail}
+              placeholder="Type your email"
+            ></CtmInputText>
+          </View>
         </View>
-      </View>
-      <View
-        style={{
-          flex: 3,
-          alignItems: "flex-end",
-          justifyContent: "center",
-          paddingHorizontal: 20,
-          backgroundColor: "#DEE3E9",
-        }}
-      >
-        <Text>{JSON.stringify(validEmail)}</Text>
-        <Pressable
+        <View
           style={{
-            backgroundColor:
-              validEmail() && validFirstName() ? "#F4CF14" : "#CBD2D9",
-            paddingHorizontal: 25,
-            paddingVertical: 10,
-            borderRadius: 10,
+            flex: 2,
+            alignItems: "flex-end",
+            justifyContent: "center",
+            paddingHorizontal: 20,
+            backgroundColor: "#DEE3E9",
           }}
-          disabled={!validEmail() || !validFirstName()}
-          onPress={send}
         >
-          <Text style={{ fontSize: 24 }}>Next</Text>
-        </Pressable>
-      </View>
+          <Pressable
+            style={{
+              backgroundColor:
+                validEmail() && validFirstName() ? "#F4CF14" : "#CBD2D9",
+              paddingHorizontal: 25,
+              paddingVertical: 10,
+              borderRadius: 10,
+            }}
+            disabled={!validEmail() || !validFirstName()}
+            onPress={send}
+          >
+            <Text style={{ fontSize: 24 }}>Next</Text>
+          </Pressable>
+        </View>
+      </KeyboardAvoidingView>
     </>
   );
 }
